@@ -1,12 +1,13 @@
+import os
 from flask import Flask, request, jsonify
 import openai
 from flask_cors import CORS
 
 app = Flask(__name__)
-CORS(app)  # Enable CORS to allow requests from your frontend
+CORS(app)
 
-# Set your OpenAI API key
-openai.api_key = "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"
+# Fetch the OpenAI API key from the environment
+openai.api_key = os.getenv("OPENAI_API_KEY")
 
 @app.route("/analyze", methods=["POST"])
 def analyze():
