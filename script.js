@@ -9,17 +9,17 @@ document.getElementById('uploadForm').addEventListener('submit', async (event) =
 
     const file = fileInput.files[0];
     try {
-        // Step 1: Extract text from PDF
+        // Step 1: Extract text from the uploaded PDF
         const text = await extractTextFromPDF(file);
         if (!text) {
             alert('Failed to extract text from the PDF.');
             return;
         }
 
-        // Step 2: Get AI-generated insights
-        const results = await getAIInsights(text);
-        if (results) {
-            displayResults(results);
+        // Step 2: Get AI-generated insights using OpenAI API
+        const insights = await getAIInsights(text);
+        if (insights) {
+            displayResults(insights);
         } else {
             alert('Failed to get insights from ChatGPT.');
         }
@@ -45,7 +45,7 @@ async function extractTextFromPDF(file) {
 
 // Call OpenAI API for insights
 async function getAIInsights(text) {
-    const apiKey = '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'; // Replace with your OpenAI API Key
+    const apiKey = 'YOUR_OPENAI_API_KEY'; // Replace with your OpenAI API Key
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
         headers: {
@@ -59,9 +59,9 @@ async function getAIInsights(text) {
                     role: 'user',
                     content: `
                     Analyze the following data:
-                    
+
                     ${text}
-                    
+
                     Provide:
                     1. A high-level executive summary.
                     2. Total impact (number of projects, statistics, amount of money raised).
