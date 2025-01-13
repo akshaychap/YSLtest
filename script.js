@@ -45,7 +45,7 @@ async function extractTextFromPDF(file) {
 
 // Call OpenAI API for insights
 async function getAIInsights(text) {
-    const apiKey = 'YOUR_OPENAI_API_KEY'; // Replace with your OpenAI API Key
+    const apiKey = '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'; // Replace with your OpenAI API Key
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
         headers: {
