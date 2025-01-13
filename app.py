@@ -11,13 +11,13 @@ openai.api_key = os.getenv("OPENAI_API_KEY")
 
 @app.route("/analyze", methods=["POST"])
 def analyze():
-    data = request.json
-    text = data.get("text", "")
-
-    if not text:
-        return jsonify({"error": "No text provided"}), 400
-
     try:
+        data = request.json
+        text = data.get("text", "")
+
+        if not text:
+            return jsonify({"error": "No text provided"}), 400
+
         response = openai.ChatCompletion.create(
             model="gpt-4",
             messages=[
@@ -38,13 +38,9 @@ def analyze():
                 }
             ]
         )
-        return jsonify({"response": response['choices'][0]['message']['content']})
+        return jsonify({"response": response.choices[0].message["content"]})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
-
-if not openai.api_key:
-    raise ValueError("OPENAI_API_KEY environment variable is not set!")
-
