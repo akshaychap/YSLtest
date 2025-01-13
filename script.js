@@ -89,3 +89,4 @@ function displayResults(results) {
     const resultsElement = document.getElementById('results');
     resultsElement.innerText = results;
 }
+ 
