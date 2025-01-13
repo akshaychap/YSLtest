@@ -8,15 +8,18 @@ document.getElementById('uploadForm').addEventListener('submit', async (event) =
     }
 
     const file = fileInput.files[0];
+    console.log('File selected:', file);
+
     try {
-        // Step 1: Extract text from the uploaded PDF
+        // Step 1: Extract text from the PDF
         const text = await extractTextFromPDF(file);
         if (!text) {
             alert('Failed to extract text from the PDF.');
             return;
         }
+        console.log('Extracted PDF text:', text);
 
-        // Step 2: Get AI-generated insights using OpenAI API
+        // Step 2: Get AI-generated insights
         const insights = await getAIInsights(text);
         if (insights) {
             displayResults(insights);
@@ -24,28 +27,33 @@ document.getElementById('uploadForm').addEventListener('submit', async (event) =
             alert('Failed to get insights from ChatGPT.');
         }
     } catch (error) {
-        console.error('Error processing the file:', error);
+        console.error('Error occurred during upload and analyze process:', error);
         alert('An error occurred. Check the console for details.');
     }
 });
 
 // Extract text from PDF using PDF.js
 async function extractTextFromPDF(file) {
-    const pdfjsLib = await import('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js');
+    console.log('Starting PDF text extraction...');
+
+    const pdfjsLib = window['pdfjs-dist/build/pdf']; // Use the globally loaded PDF.js library
     const pdf = await pdfjsLib.getDocument(URL.createObjectURL(file)).promise;
+
     let text = '';
     for (let i = 1; i <= pdf.numPages; i++) {
         const page = await pdf.getPage(i);
         const content = await page.getTextContent();
         text += content.items.map(item => item.str).join(' ') + '\n';
     }
-    console.log('Extracted PDF text:', text);
+
+    console.log('PDF text extraction completed.');
     return text;
 }
 
 // Call OpenAI API for insights
 async function getAIInsights(text) {
-    const apiKey = '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'; // Replace with your OpenAI API Key
+    console.log('Starting OpenAI API call...');
+    const apiKey = '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'; // Replace with your OpenAI API Key
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
         headers: {
@@ -75,18 +83,19 @@ async function getAIInsights(text) {
     });
 
     if (!response.ok) {
-        console.error('Error with OpenAI API:', await response.text());
+        const errorText = await response.text();
+        console.error('OpenAI API Error:', errorText);
         return null;
     }
 
     const data = await response.json();
-    console.log('AI Insights:', data);
+    console.log('OpenAI API call successful. Insights:', data);
     return data.choices[0].message.content;
 }
 
 // Display results on the page
 function displayResults(results) {
+    console.log('Displaying results...');
     const resultsElement = document.getElementById('results');
     resultsElement.innerText = results;
 }
- 
