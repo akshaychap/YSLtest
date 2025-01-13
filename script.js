@@ -19,12 +19,12 @@ document.getElementById('uploadForm').addEventListener('submit', async (event) =
         }
         console.log('Extracted PDF text:', text);
 
-        // Step 2: Get AI-generated insights
+        // Step 2: Send text to the backend for AI insights
         const insights = await getAIInsights(text);
         if (insights) {
             displayResults(insights);
         } else {
-            alert('Failed to get insights from ChatGPT.');
+            alert('Failed to get insights from the backend.');
         }
     } catch (error) {
         console.error('Error occurred during upload and analyze process:', error);
@@ -50,47 +50,28 @@ async function extractTextFromPDF(file) {
     return text;
 }
 
-// Call OpenAI API for insights
+// Call the backend to get AI insights
 async function getAIInsights(text) {
-    console.log('Starting OpenAI API call...');
-    const apiKey = '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'; // Replace with your OpenAI API Key
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    console.log('Starting backend API call...');
+    const backendUrl = 'https://ysltest.onrender.com/analyze'; // Replace with your Render URL
+
+    const response = await fetch(backendUrl, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${apiKey}`
         },
-        body: JSON.stringify({
-            model: 'gpt-4',
-            messages: [
-                {
-                    role: 'user',
-                    content: `
-                    Analyze the following data:
-
-                    ${text}
-
-                    Provide:
-                    1. A high-level executive summary.
-                    2. Total impact (number of projects, statistics, amount of money raised).
-                    3. Project notes (summarize each project briefly).
-                    4. Key risks or attention-needed areas.
-                    5. Citations for each output (mention where the data was stated in the PDF).
-                    `
-                }
-            ]
-        })
+        body: JSON.stringify({ text: text })
     });
 
     if (!response.ok) {
         const errorText = await response.text();
-        console.error('OpenAI API Error:', errorText);
+        console.error('Backend API Error:', errorText);
         return null;
     }
 
     const data = await response.json();
-    console.log('OpenAI API call successful. Insights:', data);
-    return data.choices[0].message.content;
+    console.log('Backend API call successful. Insights:', data);
+    return data.response; // Extract the generated response
 }
 
 // Display results on the page
